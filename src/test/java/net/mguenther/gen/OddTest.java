@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OddTest {
 
@@ -40,6 +41,20 @@ class OddTest {
         for (int i = 0; i < MAX_NUMBER_OF_PROBES; i++) {
             assertThat(gen.sample()).satisfies(isLower);
         }
+    }
+
+    @Test
+    @DisplayName("odd should throw IllegalArgumentException if lower and upper bound are the same")
+    void oddShouldThrowIllegalArgumentExceptionIfLowerAndUpperBoundAreTheSame() {
+        assertThrows(IllegalArgumentException.class, () -> Gen.odd(1, 1));
+        assertThrows(IllegalArgumentException.class, () -> Gen.odd(1, 1, new Random()));
+    }
+
+    @Test
+    @DisplayName("odd should throw IllegalArgumentException if lower bound is greater than the upper bound")
+    void oddShouldThrowIllegalArgumentExceptionIfLowerBoundIsGreaterThanTheUpperBound() {
+        assertThrows(IllegalArgumentException.class, () -> Gen.odd(2, 1));
+        assertThrows(IllegalArgumentException.class, () -> Gen.odd(2, 1, new Random()));
     }
 
     @Test
