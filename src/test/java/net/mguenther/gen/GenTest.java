@@ -7,17 +7,17 @@ import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class GenTest {
+class GenTest {
 
     @Test
     @DisplayName("sample should return a value obtained from the value generator")
-    public void sampleShouldReturnValueObtainedFromValueGenerator() {
+    void sampleShouldReturnValueObtainedFromValueGenerator() {
         assertThat(Gen.constant("a").sample()).isEqualTo("a");
     }
 
     @Test
     @DisplayName("thenApply should return new generator with mapping function applied to value generator")
-    public void thenApplyShouldReturnNewGeneratorWithMappingFunctionAppliedToValueGenerator() {
+    void thenApplyShouldReturnNewGeneratorWithMappingFunctionAppliedToValueGenerator() {
 
         final Gen<Integer> gen = Gen.constant("abc")
                 .thenApply(String::toUpperCase)
@@ -28,7 +28,7 @@ public class GenTest {
 
     @Test
     @DisplayName("thenCombine should return new generator based on mapping function that leverages randomness")
-    public void thenCombineShouldReturnNewGeneratorBasedOnMappingFunctionThatLeveragesSourceOfRandomness() {
+    void thenCombineShouldReturnNewGeneratorBasedOnMappingFunctionThatLeveragesSourceOfRandomness() {
 
         final Gen<String> gen = Gen.constant("abc", new Random(1L))
                 .thenCombine((r, v) -> r.nextInt())
@@ -38,16 +38,20 @@ public class GenTest {
     }
 
     @Test
-    public void flatMap() {
+    void thenComposeShouldPassOnTheSameSourceOfRandomnessFromTheFirstGenerator() {
 
-        Gen<Tuple> tupleGen = Gen.nonNegativeInteger()
+        final Gen<Tuple> tupleGen = Gen.nonNegativeInteger(new Random(1L))
                 .thenCompose((r1, x) -> Gen.nonNegativeInteger(r1)
                 .thenCompose((r2, y) -> Gen.nonNegativeInteger(r2)
                 .thenApply(z -> new Tuple(x, y, z))));
 
-        for (int i = 0; i < 100; i++) {
-            System.out.println(tupleGen.sample());
-        }
+        final Tuple tuple = tupleGen.sample();
+
+        // the assertions underneath would fail for y and z if thenCompose would not properly
+        // pass on the source of randomness from the first Generator
+        assertThat(tuple.x).isEqualTo(1155869324);
+        assertThat(tuple.y).isEqualTo(431529176);
+        assertThat(tuple.z).isEqualTo(1761283695);
     }
 
     static class Tuple {
@@ -55,7 +59,7 @@ public class GenTest {
         private final int y;
         private final int z;
 
-        public Tuple(int x, int y, int z) {
+        Tuple(int x, int y, int z) {
             this.x = x;
             this.y = y;
             this.z = z;
