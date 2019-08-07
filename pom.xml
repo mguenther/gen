@@ -11,18 +11,41 @@
     <name>gen</name>
     <url>https://www.mguenther.net</url>
 
+    <properties>
+        <version.junit.jupiter>5.5.0</version.junit.jupiter>
+        <version.assertj>3.11.1</version.assertj>
+        <version.surefire.provider>1.0.3</version.surefire.provider>
+        <plugin.version.compiler>3.8.0</plugin.version.compiler>
+        <plugin.version.surefire>2.19.1</plugin.version.surefire>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>${plugin.version.compiler}</version>
                 <configuration>
                     <source>10</source>
                     <target>10</target>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${plugin.version.surefire}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>${version.surefire.provider}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-engine</artifactId>
+                        <version>${version.junit.jupiter}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
 
@@ -31,13 +54,13 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.5.0</version>
+            <version>${version.junit.jupiter}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.11.1</version>
+            <version>${version.assertj}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
