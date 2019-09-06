@@ -116,12 +116,10 @@ public class Gen<T> {
 
     public static <T> Gen<List<T>> listOfN(final Gen<T> gen,
                                            final int length) {
-        final Function<Random, List<T>> f = r -> {
-            return Stream.iterate(gen, t -> t)
-                    .limit(Math.max(0, length))
-                    .map(Gen::sample)
-                    .collect(Collectors.toList());
-        };
+        final Function<Random, List<T>> f = r -> Stream.iterate(gen, t -> t)
+                .limit(Math.max(0, length))
+                .map(Gen::sample)
+                .collect(Collectors.toList());
         return new Gen<>(f, gen.sourceOfRandomness);
     }
 
