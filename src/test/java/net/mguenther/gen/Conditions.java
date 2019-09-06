@@ -2,9 +2,25 @@ package net.mguenther.gen;
 
 import org.assertj.core.api.Condition;
 
-public class Conditions {
+class Conditions {
 
-    public static Condition<Integer> isWithinBoundary(final int lower, final int upperExclusive) {
+    static Condition<Integer> isWithinBoundary(final int lower, final int upperExclusive) {
         return new Condition<>(n -> n >= lower && n < upperExclusive, "is within boundary");
+    }
+
+    static Condition<Integer> isLower(final int boundary) {
+        return new Condition<>(n -> n < boundary, "lower than upper bound");
+    }
+
+    static Condition<Integer> isEven() {
+        return new Condition<>(n -> n % 2 == 0, "is even");
+    }
+
+    static Condition<Integer> isOdd() {
+        return new Condition<>(n -> n % 2 != 0, "is odd");
+    }
+
+    static Condition<Integer> isGreaterThanOrEqual(final int boundary) {
+        return new Condition<>(n -> n >= boundary, "greater or equal than lower bound");
     }
 }
