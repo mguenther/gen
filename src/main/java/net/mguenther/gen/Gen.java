@@ -406,10 +406,28 @@ public class Gen<T> {
                 .thenApply(n -> n % 2 == 0 ? n + 1 : n);
     }
 
+    /**
+     * Constructs a generator that generates {@link java.lang.Double} values that are within the
+     * interval [0.0; 1.0).
+     *
+     * @return
+     *      a {@code Gen}erator that generates {@link java.lang.Double}s within the interval [0.0; 1.0)
+     */
     public static Gen<Double> normalizedDouble() {
         return normalizedDouble(new Random());
     }
 
+    /**
+     * Constructs a generator that generates {@link java.lang.Double} values that are within the
+     * interval [0.0; 1.0).
+     *
+     * Uses the given instance of {@link java.util.Random} as source of randomness.
+     *
+     * @param sourceOfRandomness
+     *      uses the given instance of {@link java.util.Random} as source of randomness
+     * @return
+     *      a {@code Gen}erator that generates {@link java.lang.Double}s within the interval [0.0; 1.0)
+     */
     public static Gen<Double> normalizedDouble(final Random sourceOfRandomness) {
         return nonNegativeInteger(sourceOfRandomness)
                 .thenApply(n -> n / ((double) Integer.MAX_VALUE + 1));
