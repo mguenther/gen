@@ -1,6 +1,7 @@
 package net.mguenther.gen;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
@@ -117,36 +118,78 @@ public class Gen<T> {
         return new Gen<>(f, sourceOfRandomness);
     }
 
+    /**
+     * Constructs a generator that generates a {@link java.util.List} of length [0; {@code maxLength}]
+     * while using the given generator {@code gen} to produce the elements of the list. This generator
+     * uses the source of randomness from the given generator {@code gen}. The {@link java.util.List}
+     * may be empty.
+     *
+     * Given the same seed, two instances of the enclosed generator will produce lists with the same
+     * length and the same elements inside of the list.
+     *
+     * @param gen
+     *      {@code Gen}erator that is used to produce the elements of the list
+     * @param maxLength
+     *      this is the maximum length (inclusive) that generated lists should have
+     * @param <T>
+     *      parameterized type of the elements in the {@link java.util.List}
+     * @return
+     *      a {@code Gen}erator that produces lists up to the size of {@code maxLength} where the
+     *      elements of that list are produced using the given generator
+     */
     public static <T> Gen<List<T>> listOf(final Gen<T> gen,
                                           final int maxLength) {
         final Function<Random, List<T>> f = r -> {
-            final int length = r.nextInt(Math.max(0, maxLength));
-            return Stream.iterate(gen, t -> t)
-                    .limit(length)
+            final int sanitizedMaxLength = Math.max(0, includeUpperBound(maxLength));
+            return sanitizedMaxLength == 0 ? Collections.emptyList() : Stream.iterate(gen, t -> t)
+                    .limit(r.nextInt(sanitizedMaxLength))
                     .map(Gen::sample)
                     .collect(Collectors.toList());
         };
         return new Gen<>(f, gen.sourceOfRandomness);
     }
 
-    public static <T> Gen<List<T>> nonEmptyListOf(final Gen<T> gen,
-                                                  final int maxLength) {
-        final Function<Random, List<T>> f = r -> {
-            final int length = r.nextInt(Math.max(0, Math.min(Integer.MAX_VALUE - 1, maxLength) + 1));
-            return Stream.iterate(gen, t -> t)
-                    .limit(length)
-                    .map(Gen::sample)
-                    .collect(Collectors.toList());
-        };
-        return new Gen<>(f, gen.sourceOfRandomness);
+    private static int includeUpperBound(final int upperBoundExclusive) {
+        return upperBoundExclusive + 1;
     }
 
+    /**
+     * Constructs a generator that generates a {@link java.util.List} of length {@code length}, while
+     * using the given generator {@code gen} to produce the elements of the list. This generator uses
+     * the source of randomness from the given generator {@code gen}. If {@code length} is less than or
+     * equal to zero, the generator will produce empty lists.
+     *
+     * Given the same seed, two instances of the enclosed generator will produce lists with the same
+     * length and the same elements inside of the list.
+     *
+     * @param gen
+     *      {@code Gen}erator that is used to produce the elements of the list
+     * @param length
+     *      this is the length (inclusive) that generated should have
+     * @param <T>
+     *      parameterized type of the elements in the {@link java.util.List}
+     * @return
+     *      a {@code Gen}erator that produces lists of the same size {@code length} where the
+     *      elements of that list are produced using the given generator
+     */
     public static <T> Gen<List<T>> listOfN(final Gen<T> gen,
                                            final int length) {
         final Function<Random, List<T>> f = r -> Stream.iterate(gen, t -> t)
                 .limit(Math.max(0, length))
                 .map(Gen::sample)
                 .collect(Collectors.toList());
+        return new Gen<>(f, gen.sourceOfRandomness);
+    }
+
+    public static <T> Gen<List<T>> nonEmptyListOf(final Gen<T> gen,
+                                                  final int maxLength) {
+        final Function<Random, List<T>> f = r -> {
+            final int length = r.nextInt(Math.max(0, includeUpperBound(Math.min(Integer.MAX_VALUE - 1, maxLength))));
+            return Stream.iterate(gen, t -> t)
+                    .limit(length)
+                    .map(Gen::sample)
+                    .collect(Collectors.toList());
+        };
         return new Gen<>(f, gen.sourceOfRandomness);
     }
 
