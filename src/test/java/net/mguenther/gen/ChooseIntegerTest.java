@@ -8,7 +8,7 @@ import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ChooseTest {
+class ChooseIntegerTest {
 
     private static final int LOWER_BOUND = -10;
 

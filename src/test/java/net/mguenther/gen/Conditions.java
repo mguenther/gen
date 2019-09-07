@@ -8,6 +8,10 @@ class Conditions {
         return new Condition<>(n -> n >= lower && n < upperExclusive, "is within boundary");
     }
 
+    static Condition<Double> isWithinBoundary(final double lower, final double upperExclusive) {
+        return new Condition<>(n -> n >= lower && n < upperExclusive, "is within boundary");
+    }
+
     static Condition<Integer> isLower(final int boundary) {
         return new Condition<>(n -> n < boundary, "lower than upper bound");
     }
