@@ -73,21 +73,48 @@ public class Gen<T> {
         return new Gen<>(() -> value, random);
     }
 
+    /**
+     * Constructs a generator that generates values of type {@code T} from the given varargs.
+     *
+     * @param values
+     *      list of values of type {@code T} from which the returned {@code Gen} produces values
+     * @return
+     *      a {@code Gen}erator that generates values from the given list of values of type {@code T}
+     */
     public static <T> Gen<T> oneOf(final T... values) {
         return oneOf(Arrays.asList(values));
     }
 
+    /**
+     * Constructs a generator that generates values of type {@code T} from the given {@link java.util.List}.
+     *
+     * @param values
+     *      list of values of type {@code T} from which the returned {@code Gen} produces values
+     * @return
+     *      a {@code Gen}erator that generates values from the given list of values of type {@code T}
+     */
     public static <T> Gen<T> oneOf(final List<T> values) {
         return oneOf(values, new Random());
     }
 
+    /**
+     * Constructs a generator that generates values of type {@code T} from the given {@link java.util.List}.
+     *
+     * @param values
+     *      list of values of type {@code T} from which the returned {@code Gen} produces values
+     * @param sourceOfRandomness
+     *      uses the given instances of {@link java.util.Random} as source of randomness
+     * @return
+     *      a {@code Gen}erator that generates values from the given list of values of type {@code T}
+     */
     public static <T> Gen<T> oneOf(final List<T> values,
-                                   final Random random) {
+                                   final Random sourceOfRandomness) {
+        if (values.isEmpty()) throw new IllegalArgumentException("The given list of values cannot be empty.");
         final Function<Random, T> f = r -> {
             final int i = r.nextInt(values.size());
             return values.get(i);
         };
-        return new Gen<>(f, random);
+        return new Gen<>(f, sourceOfRandomness);
     }
 
     public static <T> Gen<List<T>> listOf(final Gen<T> gen,
