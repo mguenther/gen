@@ -471,16 +471,57 @@ public class Gen<T> {
                 .thenApply(d -> start + d * (stopExclusive - start));
     }
 
+    /**
+     * Constructs a generator that distributes samples between the generators {@code genT1} and {@code genT2}
+     * with respect to the given threshold. Each call to {@link Gen#sample()} of this generator produces a
+     * variate x within [0.0; 1.0). If x < threshold, {@code genT1} is used to generate a sample, otherwise
+     * {@code genT2}.
+     *
+     * @param threshold
+     *      a threshold value between 0.0 (exclusive) and 1.0 (exclusive)
+     * @param genT1
+     *      the generator to use for sample generation if the variate is smaller than the given threshold
+     * @param genT2
+     *      the generator to use for sample generation if the variate is larger than or equal to the given threshold
+     * @param <T>
+     *      parameterized type of values produced by either {@code genT1} and {@code genT2}
+     * @return
+     *      a {@code Gen}erator that distributes samples between two given generators with respect to a
+     *      certain threshold
+     */
     public static <T> Gen<T> weighted(final double threshold,
                                       final Gen<T> genT1,
                                       final Gen<T> genT2) {
         return weighted(threshold, genT1, genT2, new Random());
     }
 
+    /**
+     * Constructs a generator that distributes samples between the generators {@code genT1} and {@code genT2}
+     * with respect to the given threshold. Each call to {@link Gen#sample()} of this generator produces a
+     * variate x within [0.0; 1.0). If x < threshold, {@code genT1} is used to generate a sample, otherwise
+     * {@code genT2}.
+     *
+     * Uses the given instance of {@link java.util.Random} as source of randomness.
+     *
+     * @param threshold
+     *      a threshold value between 0.0 (exclusive) and 1.0 (exclusive)
+     * @param genT1
+     *      the generator to use for sample generation if the variate is smaller than the given threshold
+     * @param genT2
+     *      the generator to use for sample generation if the variate is larger than or equal to the given threshold
+     * @param sourceOfRandomness
+     *      uses the given instance of {@link java.util.Random} as source of randomness
+     * @param <T>
+     *      parameterized type of values produced by either {@code genT1} and {@code genT2}
+     * @return
+     *      a {@code Gen}erator that distributes samples between two given generators with respect to a
+     *      certain threshold
+     */
     public static <T> Gen<T> weighted(final double threshold,
                                       final Gen<T> genT1,
                                       final Gen<T> genT2,
                                       final Random sourceOfRandomness) {
+        if (threshold <= 0.0 || threshold >= 1.0) throw new IllegalArgumentException("threshold of weighted generator must be within (0.0; 1.0)");
         return normalizedDouble(sourceOfRandomness)
                 .thenCompose(probability -> probability < threshold ? genT1 : genT2);
     }
