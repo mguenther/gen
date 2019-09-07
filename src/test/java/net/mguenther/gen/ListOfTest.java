@@ -43,15 +43,15 @@ class ListOfTest {
     @DisplayName("listOf should be able to generate lists with size equal to maxLength")
     void listOfShouldBeAbleToGenerateListsWithMaximumSize() {
         final Gen<List<Integer>> listOfGen = Gen.listOf(Gen.choose(1, 1000), 10);
-        boolean foundListAtMaximumSize = false;
+        boolean foundListWithMaximumSize = false;
         for (int i = 0; i < MAX_NUMBER_OF_PROBES; i++) {
             final List<Integer> listOfNumbers = listOfGen.sample();
             if (listOfNumbers.size() == 10) {
-                foundListAtMaximumSize = true;
+                foundListWithMaximumSize = true;
                 break;
             }
         }
-        assertThat(foundListAtMaximumSize).isTrue();
+        assertThat(foundListWithMaximumSize).isTrue();
     }
 
     @Test
