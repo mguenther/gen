@@ -123,10 +123,26 @@ public class Gen<T> {
         return new Gen<>(f, gen.sourceOfRandomness);
     }
 
+    /**
+     * Constructs a generator that generates {@link Integer}s {@code x} that are larger than or equal
+     * to zero. The largest integer that this generator may generate is {@code Integer.MAX_VALUE}.
+     *
+     * @return
+     *      a {@code Gen}erator that generates {@link Integer}s that are larger than or equal to zero
+     */
     public static Gen<Integer> nonNegativeInteger() {
         return nonNegativeInteger(new Random());
     }
 
+    /**
+     * Constructs a generator that generates {@link Integer}s {@code x} that are larger than or equal
+     * to zero. The largest integer that this generator may generate is {@code Integer.MAX_VALUE}.
+     *
+     * @param sourceOfRandomness
+     *      uses the given {@link java.util.Random} as source of randomness
+     * @return
+     *      a {@code Gen}erator that generates {@link Integer}s that are larger than or equal to zero
+     */
     public static Gen<Integer> nonNegativeInteger(final Random sourceOfRandomness) {
         final Function<Random, Integer> f = r -> {
             final int i = r.nextInt();
