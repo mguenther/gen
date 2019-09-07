@@ -65,13 +65,37 @@ public class Gen<T> {
         return new Gen<>(r -> mappingFn.apply(r, sample()).sample(), sourceOfRandomness);
     }
 
+    /**
+     * Constructs a generator that always returns the same value {@code} of type {@code T}. Retains
+     * the given source of randomness when combined with other generators.
+     *
+     * @param value
+     *      the constant value that this generator should produce
+     * @param <T>
+     *      paramterized type of the constant value
+     * @return
+     *      a {@code Gen}erator that always produces the same value
+     */
     public static <T> Gen<T> constant(final T value) {
         return constant(value, new Random());
     }
 
+    /**
+     * Constructs a generator that always returns the same value {@code} of type {@code T}. Retains
+     * the given source of randomness when combined with other generators.
+     *
+     * @param value
+     *      the constant value that this generator should produce
+     * @param sourceOfRandomness
+     *      uses the given instance of {@link java.util.Random} as source of randomness
+     * @param <T>
+     *      paramterized type of the constant value
+     * @return
+     *      a {@code Gen}erator that always produces the same value
+     */
     public static <T> Gen<T> constant(final T value,
-                                      final Random random) {
-        return new Gen<>(() -> value, random);
+                                      final Random sourceOfRandomness) {
+        return new Gen<>(() -> value, sourceOfRandomness);
     }
 
     /**
@@ -105,7 +129,7 @@ public class Gen<T> {
      * @param values
      *      list of values of type {@code T} from which the returned {@code Gen} produces values
      * @param sourceOfRandomness
-     *      uses the given instances of {@link java.util.Random} as source of randomness
+     *      uses the given instance of {@link java.util.Random} as source of randomness
      * @return
      *      a {@code Gen}erator that generates values from the given list of values of type {@code T}
      */
