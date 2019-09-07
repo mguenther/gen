@@ -82,6 +82,7 @@ public class Gen<T> {
      * @return
      *      a {@code Gen}erator that generates values from the given list of values of type {@code T}
      */
+    @SafeVarargs
     public static <T> Gen<T> oneOf(final T... values) {
         return oneOf(Arrays.asList(values));
     }
