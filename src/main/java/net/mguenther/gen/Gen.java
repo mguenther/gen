@@ -589,14 +589,46 @@ public class Gen<T> {
         return fromAlphabetString(length, DIGITS, sourceOfRandomness);
     }
 
+    /**
+     * Constructs a generator that produces {@link java.lang.String}s of the provided {@code length} using the
+     * given {@code alphabet}.
+     *
+     * Uses the given instance of {@link java.util.Random} as source of randomness.
+     *
+     * @param length
+     *      the length of the generated strings
+     * @param alphabet
+     *      the alphabet used to generate strings
+     * @return
+     *      a {@code Gen}erator that produces {@link java.lang.String}s of {@code length}, where each
+     *      {@link java.lang.String} is comprised of characters from the given alphabet
+     */
     public static Gen<String> fromAlphabetString(final int length,
                                                  final String alphabet) {
         return fromAlphabetString(length, alphabet, new Random());
     }
 
+    /**
+     * Constructs a generator that produces {@link java.lang.String}s of the provided {@code length} using the
+     * given {@code alphabet}.
+     *
+     * Uses the given instance of {@link java.util.Random} as source of randomness.
+     *
+     * @param length
+     *      the length of the generated strings
+     * @param alphabet
+     *      the alphabet used to generate strings
+     * @param sourceOfRandomness
+     *      uses the given instance of {@link java.util.Random} as source of randomness
+     * @return
+     *      a {@code Gen}erator that produces {@link java.lang.String}s of {@code length}, where each
+     *      {@link java.lang.String} is comprised of characters from the given alphabet
+     */
     public static Gen<String> fromAlphabetString(final int length,
                                                  final String alphabet,
                                                  final Random sourceOfRandomness) {
+        if (length < 0) throw new IllegalArgumentException("The requested length of generated string cannot be negative.");
+        if (alphabet == null || alphabet.isEmpty()) throw new IllegalArgumentException("The given alphabet may not be null or empty.");
         return listOfN(choose(0, alphabet.length(), sourceOfRandomness), length)
                 .thenApply(list -> list
                         .stream()

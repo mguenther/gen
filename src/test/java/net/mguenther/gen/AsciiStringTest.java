@@ -13,8 +13,8 @@ class AsciiStringTest {
     private static final int MAX_NUMBER_OF_PROBES = 10_000;
 
     @Test
-    @DisplayName("asciiString should use the complete ascii alphabet from range [0; 127)")
-    void asciiStringShouldUseTheCommonAsciiAlphabet() {
+    @DisplayName("asciiString should use the printable ASCII alphabet from range [32; 127)")
+    void asciiStringShouldUseThePrintableAsciiAlphabet() {
         final int[] sampleCountPerAsciiChar = new int[127];
         final Gen<String> asciiStringGen = Gen.asciiString(95);
         for (int i = 0; i < MAX_NUMBER_OF_PROBES; i++) {
