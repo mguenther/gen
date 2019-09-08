@@ -563,6 +563,7 @@ public class Gen<T> {
      */
     public static Gen<String> asciiString(final int length,
                                           final Random sourceOfRandomness) {
+        if (length < 0) throw new IllegalArgumentException("The requested length of generated strings cannot be negative.");
         return listOfN(choose(32, 127, sourceOfRandomness), length)
                 .thenApply(list -> list
                         .stream()
@@ -627,7 +628,7 @@ public class Gen<T> {
     public static Gen<String> fromAlphabetString(final int length,
                                                  final String alphabet,
                                                  final Random sourceOfRandomness) {
-        if (length < 0) throw new IllegalArgumentException("The requested length of generated string cannot be negative.");
+        if (length < 0) throw new IllegalArgumentException("The requested length of generated strings cannot be negative.");
         if (alphabet == null || alphabet.isEmpty()) throw new IllegalArgumentException("The given alphabet may not be null or empty.");
         return listOfN(choose(0, alphabet.length(), sourceOfRandomness), length)
                 .thenApply(list -> list

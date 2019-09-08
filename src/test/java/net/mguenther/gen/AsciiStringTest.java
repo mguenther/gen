@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AsciiStringTest {
 
@@ -54,5 +55,12 @@ class AsciiStringTest {
         for (int i = 0; i < MAX_NUMBER_OF_PROBES; i++) {
             assertThat(asciiStringGenL.sample()).isEqualTo(asciiStringGenR.sample());
         }
+    }
+
+    @Test
+    @DisplayName("asciiString should throw IllegalArgumentException if the given length is negative")
+    void asciiStringShouldThrowIllegalArgumentExceptionIfTheGivenLengthIsNegative() {
+        assertThatThrownBy(() -> Gen.asciiString(-1))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
