@@ -529,13 +529,41 @@ public class Gen<T> {
     private static final String DIGITS = "0123456789";
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toLowerCase() + DIGITS;
 
+    /**
+     * Constructs a generator that produces a {@link java.lang.String} of the requested {@code length}.
+     * The {@link java.lang.String} comprises characters from the ASCII alphabet, with the restriction
+     * that the characters must be printable (and therefore are in decimal range 32 to 126).
+     *
+     * Uses the given instance of {@link java.util.Random} as source of randomness.
+     *
+     * @param length
+     *      the length of generated ASCII strings
+     * @return
+     *      a {@code Gen}erator that produces {@link java.lang.String}s of {@code length}, where each
+     *      {@link java.lang.String} is comprised of printable ASCII characters
+     */
     public static Gen<String> asciiString(final int length) {
         return asciiString(length, new Random());
     }
 
+    /**
+     * Constructs a generator that produces a {@link java.lang.String} of the requested {@code length}.
+     * The {@link java.lang.String} comprises characters from the ASCII alphabet, with the restriction
+     * that the characters must be printable (and therefore are in decimal range 32 to 126).
+     *
+     * Uses the given instance of {@link java.util.Random} as source of randomness.
+     *
+     * @param length
+     *      the length of generated ASCII strings
+     * @param sourceOfRandomness
+     *      uses the given instance of {@link java.util.Random} as source of randomness
+     * @return
+     *      a {@code Gen}erator that produces {@link java.lang.String}s of {@code length}, where each
+     *      {@link java.lang.String} is comprised of printable ASCII characters
+     */
     public static Gen<String> asciiString(final int length,
                                           final Random sourceOfRandomness) {
-        return listOfN(choose(0, 127, sourceOfRandomness), length)
+        return listOfN(choose(32, 127, sourceOfRandomness), length)
                 .thenApply(list -> list
                         .stream()
                         .map(Character::toChars)
@@ -562,13 +590,13 @@ public class Gen<T> {
     }
 
     public static Gen<String> fromAlphabetString(final int length,
-                                                  final String alphabet) {
+                                                 final String alphabet) {
         return fromAlphabetString(length, alphabet, new Random());
     }
 
     public static Gen<String> fromAlphabetString(final int length,
-                                                  final String alphabet,
-                                                  final Random sourceOfRandomness) {
+                                                 final String alphabet,
+                                                 final Random sourceOfRandomness) {
         return listOfN(choose(0, alphabet.length(), sourceOfRandomness), length)
                 .thenApply(list -> list
                         .stream()
