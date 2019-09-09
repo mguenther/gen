@@ -10,23 +10,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * TODO: Remark on methods that accept java.util.Random as source of randomness - the user can control the seed of the randomizer
- */
 public class Gen<T> {
 
     private final Function<Random, T> valueGenerator;
 
     private final Random sourceOfRandomness;
 
-    /**
-     * Consumes a {@link Supplier<T>} that provides attributes of type {@code T}. Although this
-     * constructor expects a source of randomness (cf. {@link Random}), this source of randomness
-     * is not applied to the given {@link Supplier}.
-     *
-     * @param valueProvider
-     * @param sourceOfRandomness
-     */
     public Gen(final Supplier<T> valueProvider,
                final Random sourceOfRandomness) {
         this.valueGenerator = r -> valueProvider.get();
