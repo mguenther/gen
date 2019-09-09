@@ -12,8 +12,6 @@ import java.util.stream.Stream;
 
 /**
  * TODO: Remark on methods that accept java.util.Random as source of randomness - the user can control the seed of the randomizer
- *
- * @author Markus Günther (markus.guenther@gmail.com)
  */
 public class Gen<T> {
 
@@ -49,18 +47,80 @@ public class Gen<T> {
         return valueGenerator.apply(sourceOfRandomness);
     }
 
+    /**
+     * Constructs a new generator that wraps {@code this} generator and applies the given {@code mappingFn}
+     * when producing samples. Retains the source of randomness of {@code this} generator.
+     *
+     * @param mappingFn
+     *      mapping function that transforms samples of {@code this} generator
+     * @param <U>
+     *      parameterized type of generated samples
+     * @return
+     *      a new generator that wraps {@code this} generator and applies the given {@code mappingFn}
+     *      when producing samples
+     */
     public <U> Gen<U> thenApply(final Function<? super T, ? extends U> mappingFn) {
         return new Gen<>(r -> mappingFn.apply(sample()), sourceOfRandomness);
     }
 
-    public <U> Gen<U> thenCombine(final BiFunction<Random, ? super T, ? extends U> mappingFn) {
+    /**
+     * Constructs a new generator that wraps {@code this} generator and applies the given {@code mappingFn}
+     * when producing samples. Exposes the source of randomness of {@code this} generator to the mapping
+     * function. Retains the source of randomness of {@code this} generator.
+     *
+     * @param mappingFn
+     *      mapping function that transforms samples of {@code this} generator
+     * @param <U>
+     *      parameterized type of generated samples
+     * @return
+     *      a new generator that wraps {@code this} generator and applies the given {@code mappingFn}
+     *      when producing samples
+     */
+    public <U> Gen<U> thenApply(final BiFunction<Random, ? super T, ? extends U> mappingFn) {
         return new Gen<>(r -> mappingFn.apply(sourceOfRandomness, sample()), sourceOfRandomness);
     }
 
+    /**
+     * Constructs a new generator that wraps {@code this} generator by combining it with a different
+     * generator. Retains the source of randomness of {@code this} generator.
+     *
+     * @param mappingFn
+     *      mapping function for the combination of {@code this} generator with another generator
+     * @param <U>
+     *      parameterized type of generated samples
+     * @return
+     *      a new generator obtained by combining {@code this} generator with another generator
+     */
     public <U> Gen<U> thenCompose(final Function<? super T, ? extends Gen<U>> mappingFn) {
         return new Gen<>(r -> mappingFn.apply(sample()).sample(), sourceOfRandomness);
     }
 
+    /**
+     * Constructs a new generator that wraps {@code this} generator by combining it with a different
+     * generator. Exposes the source of randomness of {@code this} generator to the mapping function.
+     * Retains the source of randomness of {@code this} generator for the resulting generator, but not
+     * implicitly for the generator that {@code this} generator is combined with. It is recommended to
+     * pass the source of randomness of {@code this} generator explicitly to the generator to combine with.
+     *
+     * See the underneath example:
+     *
+     * <code>
+     *     Gen<Tuple> tupleGen = Gen.nonNegativeInteger(new Random(1L))
+     *       .thenCompose((r1, x) -> Gen.nonNegativeInteger(r1)
+     *       .thenCompose((r2, x) -> Gen.nonNegativeInteger(r2)
+     *       .thenApply(z -> new Tuple(x, y, z))));
+     * </code>
+     *
+     * {@code thenCompose} should always be used in this way. This ensure that the resulting generator
+     * uses the same source of randomness for all individual operations all the way through.
+     *
+     * @param mappingFn
+     *      mapping function for the combination of {@code this} generator with another generator
+     * @param <U>
+     *      parameterized type of generated samples
+     * @return
+     *      a new generator obtained by combining {@code this} generator with another generator
+     */
     public <U> Gen<U> thenCompose(final BiFunction<Random, ? super T, ? extends Gen<U>> mappingFn) {
         return new Gen<>(r -> mappingFn.apply(r, sample()).sample(), sourceOfRandomness);
     }
@@ -526,8 +586,12 @@ public class Gen<T> {
                 .thenCompose(probability -> probability < threshold ? genT1 : genT2);
     }
 
-    private static final String DIGITS = "0123456789";
-    private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toLowerCase() + DIGITS;
+    private static final String NUMERICAL_ALPHABET = "0123456789";
+
+    private static final String ALPHANUMERICAL_ALPHABET =
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toLowerCase() +
+                    NUMERICAL_ALPHABET;
 
     /**
      * Constructs a generator that produces a {@link java.lang.String} of the requested {@code length}.
@@ -572,22 +636,66 @@ public class Gen<T> {
                         .reduce("", String::concat, String::concat));
     }
 
+    /**
+     * Constructs a generator that produces {@link java.lang.String}s of length {@code lenght} using an
+     * alphanumerical alphabet.
+     *
+     * @param length
+     *      the length of the generated alphanumerical strings
+     * @return
+     *      a {@code Gen}erator that produces {@link java.lang.String}s of length {@code length} using
+     *      an alphanumerical alphabet
+     */
     public static Gen<String> alphaNumString(final int length) {
         return alphaNumString(length, new Random());
     }
 
+    /**
+     * Constructs a generator that produces {@link java.lang.String}s of length {@code lenght} using an
+     * alphanumerical alphabet.
+     *
+     * @param length
+     *      the length of the generated alphanumerical strings
+     * @param sourceOfRandomness
+     *      uses the given instance {@link java.util.Random} as source of randomness
+     * @return
+     *      a {@code Gen}erator that produces {@link java.lang.String}s of length {@code length} using
+     *      an alphanumerical alphabet
+     */
     public static Gen<String> alphaNumString(final int length,
                                              final Random sourceOfRandomness) {
-        return fromAlphabetString(length, ALPHABET, sourceOfRandomness);
+        return fromAlphabetString(length, ALPHANUMERICAL_ALPHABET, sourceOfRandomness);
     }
 
+    /**
+     * Constructs a generator that produces {@link java.lang.String}s of the provided {@code length} using a
+     * numerical alphabet.
+     *
+     * @param length
+     *      the length of the generated numerical strings
+     * @return
+     *      a {@code Gen}erator that produces {@link java.lang.String}s of length {@code length} using
+     *      a numerical alphabet
+     */
     public static Gen<String> numString(final int length) {
         return numString(length, new Random());
     }
 
+    /**
+     * Constructs a generator that produces {@link java.lang.String}s of the provided {@code length} using a
+     * numerical alphabet.
+     *
+     * @param length
+     *      the length of the generated numerical strings
+     * @param sourceOfRandomness
+     *      uses the given instance of {@link java.util.Random} as source of randomness
+     * @return
+     *      a {@code Gen}erator that produces {@link java.lang.String}s of length {@code length} using
+     *      a numerical alphabet
+     */
     public static Gen<String> numString(final int length,
                                         final Random sourceOfRandomness) {
-        return fromAlphabetString(length, DIGITS, sourceOfRandomness);
+        return fromAlphabetString(length, NUMERICAL_ALPHABET, sourceOfRandomness);
     }
 
     /**

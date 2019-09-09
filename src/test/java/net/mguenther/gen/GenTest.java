@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,18 +21,18 @@ class GenTest {
     void thenApplyShouldReturnNewGeneratorWithMappingFunctionAppliedToValueGenerator() {
 
         final Gen<Integer> gen = Gen.constant("abc")
-                .thenApply(String::toUpperCase)
+                .thenApply((Function<? super String, ? extends String>) String::toUpperCase)
                 .thenApply(String::length);
 
         assertThat(gen.sample()).isEqualTo(3);
     }
 
     @Test
-    @DisplayName("thenCombine should return new generator based on mapping function that leverages randomness")
-    void thenCombineShouldReturnNewGeneratorBasedOnMappingFunctionThatLeveragesSourceOfRandomness() {
+    @DisplayName("thenApply should return new generator based on mapping function that leverages randomness")
+    void thenApplyShouldReturnNewGeneratorBasedOnMappingFunctionThatLeveragesSourceOfRandomness() {
 
         final Gen<String> gen = Gen.constant("abc", new Random(1L))
-                .thenCombine((r, v) -> r.nextInt())
+                .thenApply((r, v) -> r.nextInt())
                 .thenApply(String::valueOf);
 
         assertThat(gen.sample()).isEqualTo("-1155869325");
