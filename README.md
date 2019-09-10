@@ -152,7 +152,7 @@ public class UserGen {
 
 ### Combinators
 
-The `Gen` monad in its current state offers two combinators `thenApply` and `thenCompose`. In functional programming lingo `thenApply` would be your `map`, while `thenCompose` would be your `flatMap`.
+The `Gen` monad in its current state offers two combinators `map` and `flatMap`.
 
 ## License
 
