@@ -18,7 +18,7 @@ class GenTest {
 
     @Test
     @DisplayName("map should return new generator with mapping function applied to value generator")
-    void thenApplyShouldReturnNewGeneratorWithMappingFunctionAppliedToValueGenerator() {
+    void mapShouldReturnNewGeneratorWithMappingFunctionAppliedToValueGenerator() {
 
         final Gen<Integer> gen = Gen.constant("abc")
                 .map((Function<? super String, ? extends String>) String::toUpperCase)
@@ -29,7 +29,7 @@ class GenTest {
 
     @Test
     @DisplayName("map should return new generator based on mapping function that leverages randomness")
-    void thenApplyShouldReturnNewGeneratorBasedOnMappingFunctionThatLeveragesSourceOfRandomness() {
+    void mapShouldReturnNewGeneratorBasedOnMappingFunctionThatLeveragesSourceOfRandomness() {
 
         final Gen<String> gen = Gen.constant("abc", new Random(1L))
                 .map((r, v) -> r.nextInt())
@@ -39,7 +39,7 @@ class GenTest {
     }
 
     @Test
-    void thenComposeShouldPassOnTheSameSourceOfRandomnessFromTheFirstGenerator() {
+    void flatMapShouldPassOnTheSameSourceOfRandomnessFromTheFirstGenerator() {
 
         final Gen<Tuple> tupleGen = Gen.nonNegativeInteger(new Random(1L))
                 .flatMap((r1, x) -> Gen.nonNegativeInteger(r1)
