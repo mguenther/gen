@@ -16,8 +16,8 @@ public class Gen<T> {
 
     private final Random sourceOfRandomness;
 
-    public Gen(final Supplier<T> valueProvider,
-               final Random sourceOfRandomness) {
+    private Gen(final Supplier<T> valueProvider,
+                final Random sourceOfRandomness) {
         this.valueGenerator = r -> valueProvider.get();
         this.sourceOfRandomness = sourceOfRandomness;
     }
