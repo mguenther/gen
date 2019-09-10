@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -112,6 +113,53 @@ public class Gen<T> {
      */
     public <U> Gen<U> flatMap(final BiFunction<Random, ? super T, ? extends Gen<U>> mappingFn) {
         return new Gen<>(r -> mappingFn.apply(r, sample()).sample(), sourceOfRandomness);
+    }
+
+    private static final int DEFAULT_LIMIT_FOR_SUCH_THAT = 100_000;
+
+    /**
+     * Constructs a new generator that automatically discards samples that do not satisfy the
+     * given {@link java.util.Predicate}. To prevent infinite-loops, this method limits the
+     * number of samples to a default of 100000 (cf. {@code DEFAULT_LIMIT_FOR_SUCH_THAT}.
+     *
+     * @param predicate
+     *      samples need to satisfy this predicate, otherwise they are discarded by the
+     *      generator
+     * @throws IllegalStateException
+     *      in case the maximum number of samples have been reached and no sample was found
+     *      that satisfied the predicate
+     * @return
+     *      a new generator that discards samples if they do not satisfy the given predicate
+     */
+    public Gen<T> suchThat(final Predicate<? super T> predicate) {
+        return suchThat(predicate, DEFAULT_LIMIT_FOR_SUCH_THAT);
+    }
+
+    /**
+     * Constructs a new generator that automatically discards samples that do not satisfy the
+     * given {@link java.util.Predicate}. To prevent infinite-loops, this method limits the
+     * number of samples to a default of 100000 (cf. {@code DEFAULT_LIMIT_FOR_SUCH_THAT}.
+     *
+     * @param predicate
+     *      samples need to satisfy this predicate, otherwise they are discarded by the
+     *      generator
+     * @param maxNumberOfSamples
+     *      the maximum number of samples generated and tested against the given predicate
+     *      until this generator gives up
+     * @throws IllegalStateException
+     *      in case the maximum number of samples have been reached and no sample was found
+     *      that satisfied the predicate
+     * @return
+     *      a new generator that discards samples if they do not satisfy the given predicate
+     */
+    public Gen<T> suchThat(final Predicate<? super T> predicate, final int maxNumberOfSamples) {
+        final Function<Random, T> suchThatFn = r -> Stream.iterate(this, t -> t)
+                .limit(maxNumberOfSamples)
+                .map(Gen::sample)
+                .filter(predicate)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Tried " + maxNumberOfSamples + " sample(s), but was unable to find one that satisfies the given predicate."));
+        return new Gen<>(suchThatFn, sourceOfRandomness);
     }
 
     /**

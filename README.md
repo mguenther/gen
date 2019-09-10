@@ -152,7 +152,7 @@ public class UserGen {
 
 ### Combinators
 
-The `Gen` monad in its current state offers two combinators `map` and `flatMap`.
+The `Gen` monad in its current state offers the combinators `map`, `flatMap` and `suchThat`.
 
 ## License
 

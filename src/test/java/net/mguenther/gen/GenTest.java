@@ -3,10 +3,13 @@ package net.mguenther.gen;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class GenTest {
 
@@ -39,6 +42,7 @@ class GenTest {
     }
 
     @Test
+    @DisplayName("flatMap should pass on the same source of randomness from the first generator")
     void flatMapShouldPassOnTheSameSourceOfRandomnessFromTheFirstGenerator() {
 
         final Gen<Tuple> tupleGen = Gen.nonNegativeInteger(new Random(1L))
@@ -53,6 +57,26 @@ class GenTest {
         assertThat(tuple.x).isEqualTo(1155869324);
         assertThat(tuple.y).isEqualTo(431529176);
         assertThat(tuple.z).isEqualTo(1761283695);
+    }
+
+    @Test
+    @DisplayName("suchThat should throw IllegalStateException if no sample could be found that satisfies the predicate")
+    void suchThatShouldThrowIllegalStateExceptionIfNoSampleCouldBeFoundThatSatisfiesThePredicate() {
+        assertThatThrownBy(() -> Gen.constant("A").suchThat(value -> !value.equals("A")).sample())
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("suchThat should discard samples that do not satisfy the predicate")
+    void suchThatShouldDiscardSamplesThatDoNotSatisfyThePredicate() {
+        // [B, A, A, A, A, A, A, B, B, B, A, A, B, A, B, B, B, B, B, A, A, B, ...]
+        final Gen<List<String>> listWithoutConditionGen = Gen.listOfN(
+                Gen.oneOf(Arrays.asList("A", "B"), new Random(1)), 100);
+        final Gen<List<String>> listWithConditionGen = Gen.listOfN(
+                Gen.oneOf(Arrays.asList("A", "B"), new Random(1)).suchThat(value -> !value.equals("A")), 100);
+
+        assertThat(listWithoutConditionGen.sample()).contains("A");
+        assertThat(listWithConditionGen.sample()).doesNotContain("A");
     }
 
     static class Tuple {
