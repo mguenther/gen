@@ -17,23 +17,23 @@ class GenTest {
     }
 
     @Test
-    @DisplayName("thenApply should return new generator with mapping function applied to value generator")
+    @DisplayName("map should return new generator with mapping function applied to value generator")
     void thenApplyShouldReturnNewGeneratorWithMappingFunctionAppliedToValueGenerator() {
 
         final Gen<Integer> gen = Gen.constant("abc")
-                .thenApply((Function<? super String, ? extends String>) String::toUpperCase)
-                .thenApply(String::length);
+                .map((Function<? super String, ? extends String>) String::toUpperCase)
+                .map(String::length);
 
         assertThat(gen.sample()).isEqualTo(3);
     }
 
     @Test
-    @DisplayName("thenApply should return new generator based on mapping function that leverages randomness")
+    @DisplayName("map should return new generator based on mapping function that leverages randomness")
     void thenApplyShouldReturnNewGeneratorBasedOnMappingFunctionThatLeveragesSourceOfRandomness() {
 
         final Gen<String> gen = Gen.constant("abc", new Random(1L))
-                .thenApply((r, v) -> r.nextInt())
-                .thenApply(String::valueOf);
+                .map((r, v) -> r.nextInt())
+                .map(String::valueOf);
 
         assertThat(gen.sample()).isEqualTo("-1155869325");
     }
@@ -42,13 +42,13 @@ class GenTest {
     void thenComposeShouldPassOnTheSameSourceOfRandomnessFromTheFirstGenerator() {
 
         final Gen<Tuple> tupleGen = Gen.nonNegativeInteger(new Random(1L))
-                .thenCompose((r1, x) -> Gen.nonNegativeInteger(r1)
-                .thenCompose((r2, y) -> Gen.nonNegativeInteger(r2)
-                .thenApply(z -> new Tuple(x, y, z))));
+                .flatMap((r1, x) -> Gen.nonNegativeInteger(r1)
+                .flatMap((r2, y) -> Gen.nonNegativeInteger(r2)
+                .map(z -> new Tuple(x, y, z))));
 
         final Tuple tuple = tupleGen.sample();
 
-        // the assertions underneath would fail for y and z if thenCompose would not properly
+        // the assertions underneath would fail for y and z if flatMap would not properly
         // pass on the source of randomness from the first Generator
         assertThat(tuple.x).isEqualTo(1155869324);
         assertThat(tuple.y).isEqualTo(431529176);

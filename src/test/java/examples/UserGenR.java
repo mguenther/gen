@@ -17,18 +17,18 @@ public class UserGenR {
 
     public static Gen<String> emailGen(final Gen<String> firstNameGen, final Gen<String> lastNameGen) {
         return firstNameGen
-                .thenCompose((r1, firstName) -> Gen.oneOf("-", ".", "_", r1)
-                .thenCompose((r2, delimiter) -> lastNameGen
-                .thenCompose((r3, lastName) -> domainNameGen(r3)
-                .thenCompose((r4, domainName) -> topLevelDomainNameGen(r4)
-                .thenApply(topLevelDomain -> String.format("%s%s%s@%s.%s", firstName, delimiter, lastName, domainName, topLevelDomain))))));
+                .flatMap((r1, firstName) -> Gen.oneOf("-", ".", "_", r1)
+                .flatMap((r2, delimiter) -> lastNameGen
+                .flatMap((r3, lastName) -> domainNameGen(r3)
+                .flatMap((r4, domainName) -> topLevelDomainNameGen(r4)
+                .map(topLevelDomain -> String.format("%s%s%s@%s.%s", firstName, delimiter, lastName, domainName, topLevelDomain))))));
     }
 
     public static Gen<User> userGen(final Random sourceOfRandomness) {
         return Gen.alphaNumString(8, sourceOfRandomness)
-                .thenCompose((r1, firstName) -> Gen.alphaNumString(8, r1)
-                .thenCompose((r2, lastName) -> emailGen(Gen.constant(firstName, r2), Gen.constant(lastName, r2))
-                .thenCompose((r3, email) -> Gen.alphaNumString(14, r3)
-                .thenApply(hashedPassword -> new User(firstName + " " + lastName, email, hashedPassword)))));
+                .flatMap((r1, firstName) -> Gen.alphaNumString(8, r1)
+                .flatMap((r2, lastName) -> emailGen(Gen.constant(firstName, r2), Gen.constant(lastName, r2))
+                .flatMap((r3, email) -> Gen.alphaNumString(14, r3)
+                .map(hashedPassword -> new User(firstName + " " + lastName, email, hashedPassword)))));
     }
 }

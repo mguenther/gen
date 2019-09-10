@@ -14,18 +14,18 @@ public class UserGen {
 
     private static Gen<String> emailGen(final Gen<String> firstNameGen, final Gen<String> lastNameGen) {
         return firstNameGen
-                .thenCompose(firstName -> Gen.oneOf("-", ".", "_")
-                .thenCompose(delimiter -> lastNameGen
-                .thenCompose(lastName -> domainNameGen()
-                .thenCompose(domainName -> topLevelDomainNameGen()
-                .thenApply(topLevelDomain -> String.format("%s%s%s@%s.%s", firstName, delimiter, lastName, domainName, topLevelDomain))))));
+                .flatMap(firstName -> Gen.oneOf("-", ".", "_")
+                .flatMap(delimiter -> lastNameGen
+                .flatMap(lastName -> domainNameGen()
+                .flatMap(domainName -> topLevelDomainNameGen()
+                .map(topLevelDomain -> String.format("%s%s%s@%s.%s", firstName, delimiter, lastName, domainName, topLevelDomain))))));
     }
 
     public static Gen<User> userGen() {
         return Gen.alphaNumString(8)
-                .thenCompose(firstName -> Gen.alphaNumString(8)
-                .thenCompose(lastName -> emailGen(Gen.constant(firstName), Gen.constant(lastName))
-                .thenCompose(email -> Gen.alphaNumString(14)
-                .thenApply(hashedPassword -> new User(firstName + " " + lastName, email, hashedPassword)))));
+                .flatMap(firstName -> Gen.alphaNumString(8)
+                .flatMap(lastName -> emailGen(Gen.constant(firstName), Gen.constant(lastName))
+                .flatMap(email -> Gen.alphaNumString(14)
+                .map(hashedPassword -> new User(firstName + " " + lastName, email, hashedPassword)))));
     }
 }

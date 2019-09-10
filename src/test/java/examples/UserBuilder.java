@@ -7,11 +7,11 @@ public class UserBuilder {
     private String username;
 
     private String email = Gen.alphaNumString(8)
-            .thenCompose(firstName -> Gen.alphaNumString(8)
-            .thenCompose(lastName -> Gen.oneOf("-", ".", "_")
-            .thenCompose(delimiter -> Gen.oneOf("com", "de", "at", "ch", "ca", "uk", "gov", "edu")
-            .thenCompose(domainName -> Gen.oneOf("mguenther", "google", "spiegel")
-            .thenApply(topLevelDomain -> String.format("%s%s%s@%s.%s", firstName, delimiter, lastName, domainName, topLevelDomain))))))
+            .flatMap(firstName -> Gen.alphaNumString(8)
+            .flatMap(lastName -> Gen.oneOf("-", ".", "_")
+            .flatMap(delimiter -> Gen.oneOf("com", "de", "at", "ch", "ca", "uk", "gov", "edu")
+            .flatMap(domainName -> Gen.oneOf("mguenther", "google", "spiegel")
+            .map(topLevelDomain -> String.format("%s%s%s@%s.%s", firstName, delimiter, lastName, domainName, topLevelDomain))))))
             .sample();
 
     private String hashedPassword = Gen.alphaNumString(14).sample();

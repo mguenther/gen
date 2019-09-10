@@ -48,7 +48,7 @@ public class Gen<T> {
      *      a new generator that wraps {@code this} generator and applies the given {@code mappingFn}
      *      when producing samples
      */
-    public <U> Gen<U> thenApply(final Function<? super T, ? extends U> mappingFn) {
+    public <U> Gen<U> map(final Function<? super T, ? extends U> mappingFn) {
         return new Gen<>(r -> mappingFn.apply(sample()), sourceOfRandomness);
     }
 
@@ -65,7 +65,7 @@ public class Gen<T> {
      *      a new generator that wraps {@code this} generator and applies the given {@code mappingFn}
      *      when producing samples
      */
-    public <U> Gen<U> thenApply(final BiFunction<Random, ? super T, ? extends U> mappingFn) {
+    public <U> Gen<U> map(final BiFunction<Random, ? super T, ? extends U> mappingFn) {
         return new Gen<>(r -> mappingFn.apply(sourceOfRandomness, sample()), sourceOfRandomness);
     }
 
@@ -80,7 +80,7 @@ public class Gen<T> {
      * @return
      *      a new generator obtained by combining {@code this} generator with another generator
      */
-    public <U> Gen<U> thenCompose(final Function<? super T, ? extends Gen<U>> mappingFn) {
+    public <U> Gen<U> flatMap(final Function<? super T, ? extends Gen<U>> mappingFn) {
         return new Gen<>(r -> mappingFn.apply(sample()).sample(), sourceOfRandomness);
     }
 
@@ -95,12 +95,12 @@ public class Gen<T> {
      *
      * <code>
      *     Gen<Tuple> tupleGen = Gen.nonNegativeInteger(new Random(1L))
-     *       .thenCompose((r1, x) -> Gen.nonNegativeInteger(r1)
-     *       .thenCompose((r2, x) -> Gen.nonNegativeInteger(r2)
-     *       .thenApply(z -> new Tuple(x, y, z))));
+     *       .flatMap((r1, x) -> Gen.nonNegativeInteger(r1)
+     *       .flatMap((r2, x) -> Gen.nonNegativeInteger(r2)
+     *       .map(z -> new Tuple(x, y, z))));
      * </code>
      *
-     * {@code thenCompose} should always be used in this way. This ensure that the resulting generator
+     * {@code flatMap} should always be used in this way. This ensure that the resulting generator
      * uses the same source of randomness for all individual operations all the way through.
      *
      * @param mappingFn
@@ -110,7 +110,7 @@ public class Gen<T> {
      * @return
      *      a new generator obtained by combining {@code this} generator with another generator
      */
-    public <U> Gen<U> thenCompose(final BiFunction<Random, ? super T, ? extends Gen<U>> mappingFn) {
+    public <U> Gen<U> flatMap(final BiFunction<Random, ? super T, ? extends Gen<U>> mappingFn) {
         return new Gen<>(r -> mappingFn.apply(r, sample()).sample(), sourceOfRandomness);
     }
 
@@ -354,7 +354,7 @@ public class Gen<T> {
                                       final int stopExclusive,
                                       final Random sourceOfRandomness) {
         return nonNegativeInteger(sourceOfRandomness)
-                .thenApply(n -> start + (n % (stopExclusive - start)));
+                .map(n -> start + (n % (stopExclusive - start)));
     }
 
     /**
@@ -403,7 +403,7 @@ public class Gen<T> {
         }
         final int stop = stopExclusive % 2 == 0 ? stopExclusive - 1 : stopExclusive;
         return choose(start, stop, sourceOfRandomness)
-                .thenApply(n -> n % 2 != 0 ? n + 1 : n);
+                .map(n -> n % 2 != 0 ? n + 1 : n);
     }
 
     /**
@@ -452,7 +452,7 @@ public class Gen<T> {
         }
         final int stop = stopExclusive % 2 != 0 ? stopExclusive - 1 : stopExclusive;
         return choose(start, stop, sourceOfRandomness)
-                .thenApply(n -> n % 2 == 0 ? n + 1 : n);
+                .map(n -> n % 2 == 0 ? n + 1 : n);
     }
 
     /**
@@ -479,7 +479,7 @@ public class Gen<T> {
      */
     public static Gen<Double> normalizedDouble(final Random sourceOfRandomness) {
         return nonNegativeInteger(sourceOfRandomness)
-                .thenApply(n -> n / ((double) Integer.MAX_VALUE + 1));
+                .map(n -> n / ((double) Integer.MAX_VALUE + 1));
     }
 
     /**
@@ -517,7 +517,7 @@ public class Gen<T> {
                                      final double stopExclusive,
                                      final Random sourceOfRandomness) {
         return normalizedDouble(sourceOfRandomness)
-                .thenApply(d -> start + d * (stopExclusive - start));
+                .map(d -> start + d * (stopExclusive - start));
     }
 
     /**
@@ -572,7 +572,7 @@ public class Gen<T> {
                                       final Random sourceOfRandomness) {
         if (threshold <= 0.0 || threshold >= 1.0) throw new IllegalArgumentException("threshold of weighted generator must be within (0.0; 1.0)");
         return normalizedDouble(sourceOfRandomness)
-                .thenCompose(probability -> probability < threshold ? genT1 : genT2);
+                .flatMap(probability -> probability < threshold ? genT1 : genT2);
     }
 
     private static final String NUMERICAL_ALPHABET = "0123456789";
@@ -618,7 +618,7 @@ public class Gen<T> {
                                           final Random sourceOfRandomness) {
         if (length < 0) throw new IllegalArgumentException("The requested length of generated strings cannot be negative.");
         return listOfN(choose(32, 127, sourceOfRandomness), length)
-                .thenApply(list -> list
+                .map(list -> list
                         .stream()
                         .map(Character::toChars)
                         .map(String::valueOf)
@@ -728,7 +728,7 @@ public class Gen<T> {
         if (length < 0) throw new IllegalArgumentException("The requested length of generated strings cannot be negative.");
         if (alphabet == null || alphabet.isEmpty()) throw new IllegalArgumentException("The given alphabet may not be null or empty.");
         return listOfN(choose(0, alphabet.length(), sourceOfRandomness), length)
-                .thenApply(list -> list
+                .map(list -> list
                         .stream()
                         .map(alphabet::charAt)
                         .map(String::valueOf)
