@@ -36,7 +36,7 @@ class GenTest {
 
         final Gen<String> gen = Gen.constant("abc", new Random(1L))
                 .map((r, v) -> r.nextInt())
-                .map(String::valueOf);
+                .map((Function<? super Integer, ? extends String>) String::valueOf);
 
         assertThat(gen.sample()).isEqualTo("-1155869325");
     }

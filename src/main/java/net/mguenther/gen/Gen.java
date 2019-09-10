@@ -67,7 +67,7 @@ public class Gen<T> {
      *      when producing samples
      */
     public <U> Gen<U> map(final BiFunction<Random, ? super T, ? extends U> mappingFn) {
-        return new Gen<>(r -> mappingFn.apply(sourceOfRandomness, sample()), sourceOfRandomness);
+        return new Gen<>(r -> mappingFn.apply(r, sample()), sourceOfRandomness);
     }
 
     /**
