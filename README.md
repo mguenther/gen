@@ -1,6 +1,7 @@
 # Gen
 
 [![Build Status](https://travis-ci.org/mguenther/gen.svg?branch=master)](https://travis-ci.org/mguenther/gen.svg)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.mguenther.gen/gen/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.mguenther.gen/gen)
 
 **Gen** provides the `Gen` monad for Java 8+. Using the `Gen` monad, developers can implement a generative approach for creating test fixtures that helps to write unit and integration tests in a lean and non-obtrusive way.
 
