@@ -95,10 +95,10 @@ public class Gen<T> {
      * See the underneath example:
      *
      * <code>
-     *     Gen<Tuple> tupleGen = Gen.nonNegativeInteger(new Random(1L))
-     *       .flatMap((r1, x) -> Gen.nonNegativeInteger(r1)
-     *       .flatMap((r2, x) -> Gen.nonNegativeInteger(r2)
-     *       .map(z -> new Tuple(x, y, z))));
+     *     Gen&lt;Tuple&gt; tupleGen = Gen.nonNegativeInteger(new Random(1L))
+     *       .flatMap((r1, x) -&gt; Gen.nonNegativeInteger(r1)
+     *       .flatMap((r2, x) -&gt; Gen.nonNegativeInteger(r2)
+     *       .map(z -&gt; new Tuple(x, y, z))));
      * </code>
      *
      * {@code flatMap} should always be used in this way. This ensure that the resulting generator
@@ -119,8 +119,8 @@ public class Gen<T> {
 
     /**
      * Constructs a new generator that automatically discards samples that do not satisfy the
-     * given {@link java.util.Predicate}. To prevent infinite-loops, this method limits the
-     * number of samples to a default of 100000 (cf. {@code DEFAULT_LIMIT_FOR_SUCH_THAT}.
+     * given {@link java.util.function.Predicate}. To prevent infinite-loops, this method limits
+     * the number of samples to a default of 100000 (cf. {@code DEFAULT_LIMIT_FOR_SUCH_THAT}.
      *
      * @param predicate
      *      samples need to satisfy this predicate, otherwise they are discarded by the
@@ -137,8 +137,8 @@ public class Gen<T> {
 
     /**
      * Constructs a new generator that automatically discards samples that do not satisfy the
-     * given {@link java.util.Predicate}. To prevent infinite-loops, this method limits the
-     * number of samples to a default of 100000 (cf. {@code DEFAULT_LIMIT_FOR_SUCH_THAT}.
+     * given {@link java.util.function.Predicate}. To prevent infinite-loops, this method limits
+     * the number of samples to a default of 100000 (cf. {@code DEFAULT_LIMIT_FOR_SUCH_THAT}.
      *
      * @param predicate
      *      samples need to satisfy this predicate, otherwise they are discarded by the
@@ -200,6 +200,8 @@ public class Gen<T> {
      *
      * @param values
      *      list of values of type {@code T} from which the returned {@code Gen} produces values
+     * @param <T>
+     *      paramterized type of the given values
      * @return
      *      a {@code Gen}erator that generates values from the given list of values of type {@code T}
      */
@@ -213,6 +215,8 @@ public class Gen<T> {
      *
      * @param values
      *      list of values of type {@code T} from which the returned {@code Gen} produces values
+     * @param <T>
+     *      paramterized type of the given values
      * @return
      *      a {@code Gen}erator that generates values from the given list of values of type {@code T}
      */
@@ -227,6 +231,8 @@ public class Gen<T> {
      *      list of values of type {@code T} from which the returned {@code Gen} produces values
      * @param sourceOfRandomness
      *      uses the given instance of {@link java.util.Random} as source of randomness
+     * @param <T>
+     *      paramterized type of the given values
      * @return
      *      a {@code Gen}erator that generates values from the given list of values of type {@code T}
      */
@@ -571,7 +577,7 @@ public class Gen<T> {
     /**
      * Constructs a generator that distributes samples between the generators {@code genT1} and {@code genT2}
      * with respect to the given threshold. Each call to {@link Gen#sample()} of this generator produces a
-     * variate x within [0.0; 1.0). If x < threshold, {@code genT1} is used to generate a sample, otherwise
+     * variate x within [0.0; 1.0). If x &lt; threshold, {@code genT1} is used to generate a sample, otherwise
      * {@code genT2}.
      *
      * @param threshold
@@ -595,7 +601,7 @@ public class Gen<T> {
     /**
      * Constructs a generator that distributes samples between the generators {@code genT1} and {@code genT2}
      * with respect to the given threshold. Each call to {@link Gen#sample()} of this generator produces a
-     * variate x within [0.0; 1.0). If x < threshold, {@code genT1} is used to generate a sample, otherwise
+     * variate x within [0.0; 1.0). If x &lt; threshold, {@code genT1} is used to generate a sample, otherwise
      * {@code genT2}.
      *
      * Uses the given instance of {@link java.util.Random} as source of randomness.
