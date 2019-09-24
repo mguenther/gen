@@ -163,6 +163,46 @@ public class Gen<T> {
     }
 
     /**
+     * Wraps the given {@link Supplier} into an instance of the {@code Gen} monad. This can be an
+     * existing call site, such as a method that takes no arguments and returns some (random) value.
+     * A call to {@link Gen#sample()} always delegates the call to the underlying method. Please
+     * note that the underlying method does not obey the source of randomness of this {@code Gen},
+     * as it is separately managed. The {@code lift} method only provides the means to unify
+     * already existing (generating) methods with the {@code Gen} monad.
+     *
+     * @param generatingFunction
+     *      an already existing call site that takes no arguments, but returns a value
+     * @param <T>
+     *      the parameterized type of the result of the existing call site
+     * @return
+     *      a new generator that wraps the existing call site
+     */
+    public static <T> Gen<T> lift(final Supplier<T> generatingFunction) {
+        return lift(generatingFunction, new Random());
+    }
+
+    /**
+     * Wraps the given {@link Supplier} into an instance of the {@code Gen} monad. This can be an
+     * existing call site, such as a method that takes no arguments and returns some (random) value.
+     * A call to {@link Gen#sample()} always delegates the call to the underlying method. Please
+     * note that the underlying method does not obey the source of randomness of this {@code Gen},
+     * as it is separately managed. The {@code lift} method only provides the means to unify
+     * already existing (generating) methods with the {@code Gen} monad.
+     *
+     * @param generatingFunction
+     *      an already existing call site that takes no arguments, but returns a value
+     * @param sourceOfRandomness
+     *      uses the given instance of {@link java.util.Random} as source of randomness
+     * @param <T>
+     *      the parameterized type of the result of the existing call site
+     * @return
+     *      a new generator that wraps the existing call site
+     */
+    public static <T> Gen<T> lift(final Supplier<T> generatingFunction, final Random sourceOfRandomness) {
+        return new Gen<>(generatingFunction, sourceOfRandomness);
+    }
+
+    /**
      * Constructs a generator that always returns the same value {@code} of type {@code T}. Retains
      * the given source of randomness when combined with other generators.
      *
