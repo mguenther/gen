@@ -272,7 +272,7 @@ public class Gen<T> {
      * @param sourceOfRandomness
      *      uses the given instance of {@link java.util.Random} as source of randomness
      * @param <T>
-     *      paramterized type of the given values
+     *      parameterized type of the given values
      * @return
      *      a {@code Gen}erator that generates values from the given list of values of type {@code T}
      */
@@ -284,6 +284,83 @@ public class Gen<T> {
             return values.get(i);
         };
         return new Gen<>(f, sourceOfRandomness);
+    }
+
+    /**
+     * Constructs a generator that selects randomly one of the provided generators to produce a sample.
+     * This method accepts a function from of type {@code Random -> List}, thus providing the means
+     * to use the same source of randomness for all generators that are passed to it.
+     *
+     * @param generatorsFn
+     *      function from {@code Random -> List}, where the list contains all generators to select from
+     * @param <T>
+     *      parameterized type of the produced samples
+     * @return
+     *      a {@code Generator} that selects randomly between one of the provided generators to produce values
+     *      of type {@code T}
+     */
+    public static <T> Gen<T> select(final Function<Random, List<Gen<T>>> generatorsFn) {
+        final Random sourceOfRandomness = new Random();
+        final List<Gen<T>> generators = generatorsFn.apply(sourceOfRandomness);
+        return oneOf(generators, sourceOfRandomness).map(Gen::sample);
+    }
+
+    /**
+     * Constructs a generator that selects randomly one of the provided generators to produce a sample.
+     * This method accepts a function from of type {@code Random -> List}, thus providing the means
+     * to use the same source of randomness for all generators that are passed to it.
+     *
+     * @param generatorsFn
+     *      function from {@code Random -> List}, where the list contains all generators to select from
+     * @param sourceOfRandomness
+     *      uses the given instance of {@link java.util.Random} as source of randomness
+     * @param <T>
+     *      parameterized type of the produced samples
+     * @return
+     *      a {@code Generator} that selects randomly between one of the provided generators to produce values
+     *      of type {@code T}
+     */
+    public static <T> Gen<T> select(final Function<Random, List<Gen<T>>> generatorsFn, final Random sourceOfRandomness) {
+        final List<Gen<T>> generators = generatorsFn.apply(sourceOfRandomness);
+        return oneOf(generators, sourceOfRandomness).map(Gen::sample);
+    }
+
+    /**
+     * Constructs a generator that selects randomly one of the provided generators to produce a sample.
+     *
+     * Please note: This method does not allow to couple the generators with the same source of randomness.
+     * If you need to do so however, use {@link Gen#select(Function)} instead.
+     *
+     * @param generators
+     *      list of generators to select from
+     * @param <T>
+     *      parameterized type of the produced samples
+     * @return
+     *      a {@code Generator} that selects randomly between one of the provided generators to produce values
+     *      of type {@code T}
+     */
+    public static <T> Gen<T> select(final List<Gen<T>> generators) {
+        return select(generators, new Random());
+    }
+
+    /**
+     * Constructs a generator that selects randomly one of the provided generators to produce a sample.
+     *
+     * Please note: This method does not allow to couple the generators with the same source of randomness.
+     * If you need to do so however, use {@link Gen#select(Function)} instead.
+     *
+     * @param generators
+     *      list of generators to select from
+     * @param sourceOfRandomness
+     *      uses the given instance of {@link java.util.Random} as source of randomness
+     * @param <T>
+     *      parameterized type of the produced samples
+     * @return
+     *      a {@code Generator} that selects randomly between one of the provided generators to produce values
+     *      of type {@code T}
+     */
+    public static <T> Gen<T> select(final List<Gen<T>> generators, final Random sourceOfRandomness) {
+        return oneOf(generators, sourceOfRandomness).map(Gen::sample);
     }
 
     /**
