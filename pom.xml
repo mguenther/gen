@@ -49,7 +49,7 @@
 
     <properties>
         <version.junit.jupiter>5.5.0</version.junit.jupiter>
-        <version.assertj>3.11.1</version.assertj>
+        <version.assertj>3.27.7</version.assertj>
         <version.surefire.provider>1.0.3</version.surefire.provider>
         <plugin.version.compiler>3.8.0</plugin.version.compiler>
         <plugin.version.surefire>2.19.1</plugin.version.surefire>
